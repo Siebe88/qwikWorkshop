@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material';
 import { User } from '../types';
 import { artificialDelay } from '../utils/performance';
+import { useThemeMode } from '../theme-registry';
 
 interface HeaderProps {
   currentUser: User;
@@ -33,9 +34,11 @@ interface HeaderProps {
 export default function Header({ currentUser }: HeaderProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>(null);
-  const [darkMode, setDarkMode] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(3);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Get dark mode from context
+  const { darkMode, toggleDarkMode } = useThemeMode();
 
   // Effect to simulate loading state and add delay
   useEffect(() => {
@@ -78,9 +81,9 @@ export default function Header({ currentUser }: HeaderProps) {
     setUnreadNotifications(0);
   };
 
-  const toggleDarkMode = () => {
-    artificialDelay(100);
-    setDarkMode(!darkMode);
+  const handleToggleDarkMode = () => {
+    // Remove artificial delay for faster theme switching
+    toggleDarkMode();
   };
 
   // Dummy notifications
@@ -116,7 +119,7 @@ export default function Header({ currentUser }: HeaderProps) {
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Tooltip title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
-            <IconButton color="inherit" onClick={toggleDarkMode}>
+            <IconButton color="inherit" onClick={handleToggleDarkMode}>
               {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
           </Tooltip>

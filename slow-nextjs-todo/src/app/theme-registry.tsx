@@ -5,14 +5,22 @@ import { useServerInsertedHTML } from 'next/navigation';
 import { CacheProvider } from '@emotion/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { useState } from 'react';
+import { useState, createContext, useContext } from 'react';
 
-// Create an extremely large theme object with many unnecessary options
-// to increase the serialization/hydration cost
-const createExcessiveTheme = () => {
+// Create a context for theme mode
+export const ThemeModeContext = createContext({
+  darkMode: false,
+  toggleDarkMode: () => {},
+});
+
+// Custom hook to use the theme mode
+export const useThemeMode = () => useContext(ThemeModeContext);
+
+// Create a more efficient theme object
+const createOptimizedTheme = (darkMode: boolean) => {
   const baseTheme = createTheme({
     palette: {
-      mode: 'light',
+      mode: darkMode ? 'dark' : 'light',
       primary: {
         main: '#1976d2',
         light: '#42a5f5',
@@ -25,16 +33,6 @@ const createExcessiveTheme = () => {
         dark: '#7b1fa2',
         contrastText: '#fff',
       },
-      // Add many more color variations to make the theme object larger
-      ...Array.from({ length: 20 }).reduce((acc, _, i) => {
-        acc[`custom${i}`] = {
-          main: '#e91e63',
-          light: '#f48fb1',
-          dark: '#c2185b',
-          contrastText: '#fff',
-        };
-        return acc;
-      }, {} as Record<string, any>),
     },
     typography: {
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
@@ -43,62 +41,32 @@ const createExcessiveTheme = () => {
       fontWeightRegular: 400,
       fontWeightMedium: 500,
       fontWeightBold: 700,
-      // Add many Typography variants
-      ...Array.from({ length: 30 }).reduce((acc, _, i) => {
-        acc[`customVariant${i}`] = {
-          fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-          fontSize: 14 + i * 0.2,
-          fontWeight: 400,
-          lineHeight: 1.5 + i * 0.05,
-          letterSpacing: `${0.1 + i * 0.01}em`,
-        };
-        return acc;
-      }, {} as Record<string, any>),
     },
-    // Add many more unnecessarily complex theme options
-    customOptions: Array.from({ length: 50 }).reduce((acc, _, i) => {
-      acc[`option${i}`] = {
-        value: `value-${i}`,
-        nestedObject: {
-          property1: `property-${i}`,
-          property2: `property-${i * 2}`,
-          deeperNesting: {
-            deep1: `deep-value-${i}`,
-            deep2: `deep-value-${i * 2}`,
-            deepest: {
-              ultraDeep: `ultra-deep-${i}`,
-            },
-          },
-        },
-      };
-      return acc;
-    }, {} as Record<string, any>),
   });
 
-  // This creates a massive object that will slow down hydration
   return baseTheme;
 };
 
-// Create the massive theme
-const theme = createExcessiveTheme();
+// Create light and dark themes once to avoid recreating them on each toggle
+const lightTheme = createOptimizedTheme(false);
+const darkTheme = createOptimizedTheme(true);
 
-// Forced expensive computation on client side
-const expensiveComputation = () => {
-  let result = 0;
-  for (let i = 0; i < 10000000; i++) {
-    result += Math.sin(i) * Math.cos(i);
-  }
-  return result;
-};
+// Type definition to handle Emotion cache serialization
+interface SerializedStyles {
+  name: string;
+  [key: string]: string | number | boolean | null | undefined;
+}
 
 export default function ThemeRegistry({ children }: { children: React.ReactNode }) {
+  const [darkMode, setDarkMode] = useState(false);
   const [{ cache, flush }] = useState(() => {
     const cache = createCache({ key: 'mui' });
     cache.compat = true;
     const prevInsert = cache.insert;
     let inserted: string[] = [];
     cache.insert = (...args) => {
-      const serialized = args[0];
+      // Handle the Emotion serialized styles - proper type conversion
+      const serialized = args[0] as unknown as SerializedStyles;
       if (cache.inserted[serialized.name] === undefined) {
         inserted.push(serialized.name);
       }
@@ -111,6 +79,14 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
     };
     return { cache, flush };
   });
+
+  // Use pre-created themes instead of creating new ones on each render
+  const theme = darkMode ? darkTheme : lightTheme;
+
+  // Toggle dark mode function
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   useServerInsertedHTML(() => {
     const names = flush();
@@ -132,19 +108,15 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
     );
   });
 
-  // On client-side, trigger expensive computation during hydration
-  if (typeof window !== 'undefined') {
-    // This will run during hydration and block the main thread
-    const result = expensiveComputation();
-    console.log({ expensiveComputationResult: result });
-  }
-
+  // Provide the theme mode context to children
   return (
-    <CacheProvider value={cache}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
-    </CacheProvider>
+    <ThemeModeContext.Provider value={{ darkMode, toggleDarkMode }}>
+      <CacheProvider value={cache}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
+      </CacheProvider>
+    </ThemeModeContext.Provider>
   );
 }
