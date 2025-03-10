@@ -14,10 +14,10 @@ import {
   metaItem,
   collapsibleContent,
   historyItem,
-} from './todo-item.css';
-import { Checkbox } from '../ui/checkbox';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+} from './TodoItem.css';
+import { Checkbox } from '../ui/Checkbox';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 import { Todo, User } from '../../types';
 import {
   CalendarIcon,
@@ -29,7 +29,7 @@ import {
   TrashIcon,
   InfoIcon,
   BookmarkIcon,
-} from '../icons';
+} from '../Icons';
 
 export interface TodoItemProps {
   todo: Todo;

@@ -1,9 +1,9 @@
 import { component$, useSignal, $, type PropFunction } from '@builder.io/qwik';
 import { User } from '../types';
-import { Button } from './ui/button';
+import { Button } from './ui/Button';
 
 // Import our custom icons
-import { MenuIcon, BellIcon, SettingsIcon, UserIcon, SunIcon, MoonIcon } from './icons';
+import { MenuIcon, BellIcon, SettingsIcon, UserIcon, SunIcon, MoonIcon } from './Icons';
 
 export interface HeaderProps {
   currentUser: User;

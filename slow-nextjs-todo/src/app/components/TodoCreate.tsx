@@ -16,7 +16,7 @@ import {
   Chip,
   FormHelperText,
 } from '@mui/material';
-import { Add as AddIcon, ExpandMore as ExpandMoreIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import { Add as AddIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { User, Todo } from '../types';
 import { artificialDelay } from '../utils/performance';
 

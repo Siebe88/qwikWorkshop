@@ -1,7 +1,7 @@
 import { component$, useContext } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
-import { TodoList } from '~/components/todos/todo-list';
-import { Header } from '~/components/header';
+import { TodoList } from '~/components/todos/TodoList';
+import { Header } from '~/components/Header';
 import { sampleTodos, sampleUsers } from '~/utils/data';
 import { ThemeContext } from '~/root';
 

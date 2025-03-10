@@ -1,12 +1,12 @@
 import { component$, useSignal, useStore, $, useVisibleTask$, type PropFunction } from '@builder.io/qwik';
-import { TodoItem } from './todo-item';
+import { TodoItem } from './TodoItem';
 import { Todo, User, FilterOptions } from '../../types';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { TodoFilter } from './todo-filter';
-import { TodoCreate } from './todo-create';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { TodoFilter } from './TodoFilter';
+import { TodoCreate } from './TodoCreate';
 import { addPerformanceMetricsElement } from '../../utils/performance';
-import { PlusIcon } from '../icons';
+import { PlusIcon } from '../Icons';
 
 export interface TodoListProps {
   initialTodos: Todo[];
@@ -169,16 +169,20 @@ export const TodoList = component$<TodoListProps>((props) => {
 
         {filteredTodos.length === 0 ? (
           <Card>
-            <CardContent style={{ textAlign: 'center', padding: '32px' }}>
-              <CardTitle style={{ marginBottom: '8px' }}>No todos found</CardTitle>
-              <p style={{ marginBottom: '16px', color: 'var(--muted-foreground)' }}>
-                Try adjusting your filters or create a new todo
-              </p>
-              <Button intent="primary" onClick$={() => {}}>
-                <PlusIcon />
-                Add New Todo
-              </Button>
-            </CardContent>
+            <div style={{ textAlign: 'center', padding: '32px' }}>
+              <CardContent>
+                <div style={{ marginBottom: '8px' }}>
+                  <CardTitle>No todos found</CardTitle>
+                </div>
+                <p style={{ marginBottom: '16px', color: 'var(--muted-foreground)' }}>
+                  Try adjusting your filters or create a new todo
+                </p>
+                <Button intent="primary" onClick$={() => {}}>
+                  <PlusIcon />
+                  Add New Todo
+                </Button>
+              </CardContent>
+            </div>
           </Card>
         ) : (
           <>
