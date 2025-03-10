@@ -102,15 +102,15 @@ export const TodoFilter = component$<TodoFilterProps>((props) => {
                   placeholder="Search todos..."
                   value={tempFilters.search}
                   onChange$={(e: any) => handleSearchChange(e.target.value)}
-                  startIcon
-                >
-                  <SearchIcon />
-                  {tempFilters.search && (
-                    <div style={{ marginLeft: '4px', cursor: 'pointer' }} onClick$={() => handleSearchChange('')}>
-                      <XIcon />
-                    </div>
-                  )}
-                </Input>
+                  startIcon={<SearchIcon />}
+                  endIcon={
+                    tempFilters.search ? (
+                      <div style={{ cursor: 'pointer' }} onClick$={() => handleSearchChange('')}>
+                        <XIcon />
+                      </div>
+                    ) : undefined
+                  }
+                />
               </div>
 
               <div

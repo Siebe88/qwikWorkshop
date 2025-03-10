@@ -1,20 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Divider,
-  CircularProgress,
-  Container,
-  Alert,
-  Paper,
-  Grid,
-  Button,
-  Skeleton,
-  Pagination,
-  Fab,
-} from '@mui/material';
+import { Box, Typography, Paper, Skeleton, Pagination, Fab } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Todo, User, FilterOptions } from '../types';
 import TodoItem from './TodoItem';
@@ -42,7 +29,6 @@ export default function TodoListClient({ initialTodos, users, currentUser }: Tod
     search: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [isAddingTodo, setIsAddingTodo] = useState(false);
   const itemsPerPage = 10;
 
   // Render timer
@@ -59,19 +45,6 @@ export default function TodoListClient({ initialTodos, users, currentUser }: Tod
         setFinishTTI(() => ttiMeasurement);
       }
 
-      // Remove artificial delay
-      // artificialDelay(1500);
-
-      // Remove unnecessary expensive work
-      // const expensiveCalculation = () => {
-      //   let result = 0;
-      //   for (let i = 0; i < 8000000; i++) {
-      //     result += Math.sin(i) * Math.cos(i);
-      //   }
-      //   return result;
-      // };
-      // expensiveCalculation();
-
       setIsLoading(false);
       setIsHydrated(true);
 
@@ -84,7 +57,7 @@ export default function TodoListClient({ initialTodos, users, currentUser }: Tod
 
       renderTimer.end();
     }
-  }, []);
+  }, [finishTTI, renderTimer]);
 
   // Filter todos based on current filters
   const filteredTodos = todos.filter((todo) => {
@@ -233,15 +206,6 @@ export default function TodoListClient({ initialTodos, users, currentUser }: Tod
               <Typography variant="body2" color="text.secondary">
                 Try adjusting your filters or create a new todo
               </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddIcon />}
-                sx={{ mt: 2 }}
-                onClick={() => setIsAddingTodo(true)}
-              >
-                Add New Todo
-              </Button>
             </Paper>
           ) : (
             <>
@@ -277,7 +241,6 @@ export default function TodoListClient({ initialTodos, users, currentUser }: Tod
       <Fab
         color="primary"
         aria-label="add"
-        onClick={() => setIsAddingTodo(true)}
         sx={{
           position: 'fixed',
           bottom: 20,

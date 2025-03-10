@@ -6,7 +6,6 @@ import { Button } from '../ui/Button';
 import { TodoFilter } from './TodoFilter';
 import { TodoCreate } from './TodoCreate';
 import { addPerformanceMetricsElement } from '../../utils/performance';
-import { PlusIcon } from '../Icons';
 
 export interface TodoListProps {
   initialTodos: Todo[];
@@ -177,10 +176,6 @@ export const TodoList = component$<TodoListProps>((props) => {
                 <p style={{ marginBottom: '16px', color: 'var(--muted-foreground)' }}>
                   Try adjusting your filters or create a new todo
                 </p>
-                <Button intent="primary" onClick$={() => {}}>
-                  <PlusIcon />
-                  Add New Todo
-                </Button>
               </CardContent>
             </div>
           </Card>
