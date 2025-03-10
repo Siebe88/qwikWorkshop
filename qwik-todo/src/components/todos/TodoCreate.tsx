@@ -103,17 +103,25 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
 
   return (
     <Card variant="default">
-      <div style={{ marginBottom: '24px' }}>
-        <CardContent>
-          <div style={{ padding: '16px' }}>
+      <CardContent>
+        <div
+          style={{
+            padding: '16px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            borderRadius: '8px',
+            backgroundColor: 'white',
+          }}
+        >
+          {!expanded.value ? (
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
+                gap: '16px',
+                width: '100%',
               }}
             >
-              {!expanded.value ? (
+              <div style={{ flex: '1' }}>
                 <Input
                   placeholder="Add a new todo..."
                   value={title.value}
@@ -124,20 +132,91 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
                     }
                   }}
                   error={titleError.value}
-                  style={{ marginRight: '16px' }}
+                  style={{ width: '100%' }}
                 />
-              ) : (
-                <h3 style={{ margin: 0 }}>Create New Todo</h3>
-              )}
+              </div>
 
-              <Button intent={expanded.value ? 'outline' : 'primary'} onClick$={handleExpandClick}>
-                {expanded.value ? 'Collapse' : 'Expand'}
-                <div style={{ marginLeft: '4px' }}>{expanded.value ? <ChevronUpIcon /> : <ChevronDownIcon />}</div>
+              <Button
+                intent="outline"
+                onClick$={handleExpandClick}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  fontWeight: '500',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Expand
+                <ChevronDownIcon />
+              </Button>
+
+              <Button
+                intent="primary"
+                onClick$={handleSubmit}
+                disabled={isSubmitting.value || !title.value.trim()}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  fontWeight: '500',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <PlusIcon />
+                <span>Add Todo</span>
               </Button>
             </div>
+          ) : (
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    color: '#111827',
+                  }}
+                >
+                  Create New Todo
+                </h3>
 
-            {expanded.value && (
-              <form preventdefault:submit onSubmit$={handleSubmit} style={{ marginTop: '16px' }}>
+                <Button
+                  intent="outline"
+                  onClick$={handleExpandClick}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    fontWeight: '500',
+                  }}
+                >
+                  Collapse
+                  <ChevronUpIcon />
+                </Button>
+              </div>
+
+              <form
+                preventdefault:submit
+                onSubmit$={handleSubmit}
+                style={{
+                  marginTop: '16px',
+                  borderTop: '1px solid #e5e7eb',
+                  paddingTop: '16px',
+                }}
+              >
                 <div
                   style={{
                     display: 'grid',
@@ -165,7 +244,8 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
                         display: 'block',
                         marginBottom: '8px',
                         fontSize: '14px',
-                        fontWeight: 500,
+                        fontWeight: '500',
+                        color: '#374151',
                       }}
                     >
                       Description
@@ -176,12 +256,15 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
                       rows={4}
                       style={{
                         width: '100%',
-                        padding: '8px 12px',
-                        borderRadius: '4px',
-                        border: '1px solid var(--border)',
-                        backgroundColor: 'var(--input)',
-                        color: 'var(--foreground)',
+                        padding: '10px 12px',
+                        borderRadius: '6px',
+                        border: '1px solid #d1d5db',
+                        backgroundColor: 'white',
+                        color: '#111827',
+                        fontSize: '14px',
                         resize: 'vertical',
+                        outline: 'none',
+                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
                       }}
                     />
                   </div>
@@ -199,7 +282,8 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
                           display: 'block',
                           marginBottom: '8px',
                           fontSize: '14px',
-                          fontWeight: 500,
+                          fontWeight: '500',
+                          color: '#374151',
                         }}
                       >
                         Priority
@@ -209,11 +293,14 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
                         onChange$={(e: any) => (priority.value = e.target.value)}
                         style={{
                           width: '100%',
-                          padding: '8px 12px',
-                          borderRadius: '4px',
-                          border: '1px solid var(--border)',
-                          backgroundColor: 'var(--background)',
-                          color: 'var(--foreground)',
+                          padding: '10px 12px',
+                          borderRadius: '6px',
+                          border: '1px solid #d1d5db',
+                          backgroundColor: 'white',
+                          color: '#111827',
+                          fontSize: '14px',
+                          outline: 'none',
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
                         }}
                       >
                         <option value="low">Low</option>
@@ -228,7 +315,8 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
                           display: 'block',
                           marginBottom: '8px',
                           fontSize: '14px',
-                          fontWeight: 500,
+                          fontWeight: '500',
+                          color: '#374151',
                         }}
                       >
                         Assign To
@@ -238,11 +326,14 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
                         onChange$={(e: any) => (assignedTo.value = e.target.value || null)}
                         style={{
                           width: '100%',
-                          padding: '8px 12px',
-                          borderRadius: '4px',
-                          border: '1px solid var(--border)',
-                          backgroundColor: 'var(--background)',
-                          color: 'var(--foreground)',
+                          padding: '10px 12px',
+                          borderRadius: '6px',
+                          border: '1px solid #d1d5db',
+                          backgroundColor: 'white',
+                          color: '#111827',
+                          fontSize: '14px',
+                          outline: 'none',
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
                         }}
                       >
                         <option value="">None</option>
@@ -260,24 +351,26 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
                           display: 'block',
                           marginBottom: '8px',
                           fontSize: '14px',
-                          fontWeight: 500,
+                          fontWeight: '500',
+                          color: '#374151',
                         }}
                       >
                         Due Date
                       </label>
                       <input
                         type="date"
-                        value={dueDate.value ? dueDate.value.split('T')[0] : ''}
-                        onChange$={(e: any) =>
-                          (dueDate.value = e.target.value ? new Date(e.target.value).toISOString() : null)
-                        }
+                        value={dueDate.value || ''}
+                        onChange$={(e: any) => (dueDate.value = e.target.value || null)}
                         style={{
                           width: '100%',
-                          padding: '8px 12px',
-                          borderRadius: '4px',
-                          border: '1px solid var(--border)',
-                          backgroundColor: 'var(--background)',
-                          color: 'var(--foreground)',
+                          padding: '10px 12px',
+                          borderRadius: '6px',
+                          border: '1px solid #d1d5db',
+                          backgroundColor: 'white',
+                          color: '#111827',
+                          fontSize: '14px',
+                          outline: 'none',
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
                         }}
                       />
                     </div>
@@ -289,56 +382,66 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
                         display: 'block',
                         marginBottom: '8px',
                         fontSize: '14px',
-                        fontWeight: 500,
+                        fontWeight: '500',
+                        color: '#374151',
                       }}
                     >
                       Tags
                     </label>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <Input
-                        placeholder="Type and press Enter to add tags"
+                        placeholder="Add a tag..."
                         value={currentTag.value}
                         onChange$={(e: any) => (currentTag.value = e.target.value)}
-                        onKeyDown$={(e: any) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleAddTag();
-                          }
-                        }}
+                        style={{ flex: 1 }}
                       />
-                      <Button type="button" onClick$={handleAddTag}>
-                        Add
+                      <Button
+                        type="button"
+                        intent="outline"
+                        onClick$={handleAddTag}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: '8px 16px',
+                          borderRadius: '6px',
+                        }}
+                      >
+                        <PlusIcon />
+                        <span>Add</span>
                       </Button>
                     </div>
 
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: '8px',
-                        marginTop: '8px',
-                      }}
-                    >
-                      {tags.map((tag, index) => (
-                        <div
-                          key={index}
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            padding: '4px 8px',
-                            backgroundColor: 'var(--primary-background)',
-                            color: 'var(--primary-foreground)',
-                            borderRadius: '9999px',
-                            fontSize: '12px',
-                          }}
-                        >
-                          {tag}
-                          <div style={{ marginLeft: '4px', cursor: 'pointer' }} onClick$={() => handleRemoveTag(tag)}>
-                            <XIcon />
+                    {tags.length > 0 && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: '8px',
+                          marginTop: '8px',
+                        }}
+                      >
+                        {tags.map((tag) => (
+                          <div
+                            key={tag}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              backgroundColor: '#f3f4f6',
+                              borderRadius: '16px',
+                              padding: '4px 12px',
+                              fontSize: '14px',
+                              gap: '6px',
+                            }}
+                          >
+                            {tag}
+                            <div style={{ cursor: 'pointer' }} onClick$={() => handleRemoveTag(tag)}>
+                              <XIcon />
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div
@@ -346,42 +449,53 @@ export const TodoCreate = component$<TodoCreateProps>((props) => {
                       display: 'flex',
                       justifyContent: 'flex-end',
                       gap: '8px',
-                      marginTop: '16px',
+                      marginTop: '8px',
+                      paddingTop: '16px',
+                      borderTop: '1px solid #e5e7eb',
                     }}
                   >
-                    <Button type="button" intent="outline" onClick$={() => (expanded.value = false)}>
+                    <Button
+                      type="button"
+                      intent="outline"
+                      onClick$={() => {
+                        expanded.value = false;
+                        title.value = '';
+                        description.value = '';
+                        priority.value = 'medium';
+                        assignedTo.value = null;
+                        dueDate.value = null;
+                        tags.length = 0;
+                        titleError.value = '';
+                      }}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: '6px',
+                      }}
+                    >
                       Cancel
                     </Button>
-                    <Button type="submit" intent="primary" disabled={isSubmitting.value || !title.value.trim()}>
-                      <div style={{ marginRight: '4px' }}>
-                        <PlusIcon />
-                      </div>
-                      {isSubmitting.value ? 'Adding...' : 'Add Todo'}
+                    <Button
+                      type="submit"
+                      intent="primary"
+                      disabled={isSubmitting.value}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <PlusIcon />
+                      <span>Add Todo</span>
                     </Button>
                   </div>
                 </div>
               </form>
-            )}
-
-            {!expanded.value && (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  marginTop: '16px',
-                }}
-              >
-                <Button intent="primary" onClick$={handleSubmit} disabled={isSubmitting.value || !title.value.trim()}>
-                  <div style={{ marginRight: '4px' }}>
-                    <PlusIcon />
-                  </div>
-                  {isSubmitting.value ? 'Adding...' : 'Add Todo'}
-                </Button>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </div>
+            </div>
+          )}
+        </div>
+      </CardContent>
     </Card>
   );
 });

@@ -25,7 +25,6 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { FilterOptions, User } from '../types';
-import { artificialDelay } from '../utils/performance';
 
 interface TodoFilterProps {
   filterOptions: FilterOptions;
@@ -35,83 +34,48 @@ interface TodoFilterProps {
 
 export default function TodoFilter({ filterOptions, onFilterChange, users }: TodoFilterProps) {
   const [expanded, setExpanded] = useState(false);
-  const [tempFilters, setTempFilters] = useState<FilterOptions>(filterOptions);
+  const [localFilters, setLocalFilters] = useState<FilterOptions>(filterOptions);
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
-  // Inefficient effect that recalculates on every render
-  useEffect(() => {
-    // Artificial delay to simulate slow component
-    artificialDelay(150);
+  // Removed intentionally inefficient effect and expensive calculation
 
-    // Unnecessary state update and computations
-    setTempFilters(filterOptions);
-
-    // Count active filters
-    let count = 0;
-    if (filterOptions.status !== 'all') count++;
-    if (filterOptions.priority !== 'all') count++;
-    if (filterOptions.assignee !== 'all') count++;
-    if (filterOptions.search) count++;
-    setActiveFiltersCount(count);
-
-    // More unnecessary work to slow things down
-    const expensiveCalculation = () => {
-      let result = 0;
-      for (let i = 0; i < 50000; i++) {
-        result += Math.sin(i) * Math.cos(i);
-      }
-      return result;
-    };
-
-    expensiveCalculation();
-  }, [filterOptions]);
-
-  // Expensive handlers with artificial delays
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    artificialDelay(50);
-    const newValue = e.target.value;
-    setTempFilters((prev) => ({ ...prev, search: newValue }));
-
-    // Apply search filter immediately without debouncing
-    onFilterChange({ ...filterOptions, search: newValue });
+    const newFilters = { ...localFilters, search: e.target.value };
+    setLocalFilters(newFilters);
+    onFilterChange(newFilters);
   };
 
   const handleStatusChange = (e: any) => {
-    artificialDelay(30);
-    const newValue = e.target.value;
-    setTempFilters((prev) => ({ ...prev, status: newValue }));
-    onFilterChange({ ...filterOptions, status: newValue });
+    const newFilters = { ...localFilters, status: e.target.value };
+    setLocalFilters(newFilters);
+    onFilterChange(newFilters);
   };
 
   const handlePriorityChange = (e: any) => {
-    artificialDelay(30);
-    const newValue = e.target.value;
-    setTempFilters((prev) => ({ ...prev, priority: newValue }));
-    onFilterChange({ ...filterOptions, priority: newValue });
+    const newFilters = { ...localFilters, priority: e.target.value };
+    setLocalFilters(newFilters);
+    onFilterChange(newFilters);
   };
 
   const handleAssigneeChange = (e: any) => {
-    artificialDelay(30);
-    const newValue = e.target.value;
-    setTempFilters((prev) => ({ ...prev, assignee: newValue }));
-    onFilterChange({ ...filterOptions, assignee: newValue });
+    const newFilters = { ...localFilters, assignee: e.target.value };
+    setLocalFilters(newFilters);
+    onFilterChange(newFilters);
   };
 
   const handleExpandClick = () => {
-    artificialDelay(50);
     setExpanded(!expanded);
   };
 
   const handleClearFilters = () => {
-    artificialDelay(100);
-    const resetFilters: FilterOptions = {
+    const defaultFilters: FilterOptions = {
       status: 'all',
       priority: 'all',
       assignee: 'all',
       search: '',
     };
-    setTempFilters(resetFilters);
-    onFilterChange(resetFilters);
+    setLocalFilters(defaultFilters);
+    onFilterChange(defaultFilters);
   };
 
   // Render active filter chips for better UX (but with performance cost)
@@ -204,7 +168,7 @@ export default function TodoFilter({ filterOptions, onFilterChange, users }: Tod
           <TextField
             fullWidth
             placeholder="Search todos..."
-            value={tempFilters.search}
+            value={localFilters.search}
             onChange={handleSearchChange}
             InputProps={{
               startAdornment: (
@@ -212,7 +176,7 @@ export default function TodoFilter({ filterOptions, onFilterChange, users }: Tod
                   <SearchIcon />
                 </InputAdornment>
               ),
-              endAdornment: tempFilters.search ? (
+              endAdornment: localFilters.search ? (
                 <InputAdornment position="end">
                   <IconButton size="small" onClick={() => handleSearchChange({ target: { value: '' } } as any)}>
                     <ClearIcon fontSize="small" />
@@ -270,7 +234,7 @@ export default function TodoFilter({ filterOptions, onFilterChange, users }: Tod
                   <Select
                     labelId="status-filter-label"
                     id="status-filter"
-                    value={tempFilters.status}
+                    value={localFilters.status}
                     label="Status"
                     onChange={handleStatusChange}
                   >
@@ -287,7 +251,7 @@ export default function TodoFilter({ filterOptions, onFilterChange, users }: Tod
                   <Select
                     labelId="priority-filter-label"
                     id="priority-filter"
-                    value={tempFilters.priority}
+                    value={localFilters.priority}
                     label="Priority"
                     onChange={handlePriorityChange}
                   >
@@ -305,7 +269,7 @@ export default function TodoFilter({ filterOptions, onFilterChange, users }: Tod
                   <Select
                     labelId="assignee-filter-label"
                     id="assignee-filter"
-                    value={tempFilters.assignee}
+                    value={localFilters.assignee}
                     label="Assignee"
                     onChange={handleAssigneeChange}
                   >

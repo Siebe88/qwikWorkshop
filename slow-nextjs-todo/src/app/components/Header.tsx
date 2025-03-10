@@ -23,7 +23,6 @@ import {
   Menu as MenuIcon,
 } from '@mui/icons-material';
 import { User } from '../types';
-import { artificialDelay } from '../utils/performance';
 import { useThemeMode } from '../theme-registry';
 
 interface HeaderProps {
@@ -40,49 +39,32 @@ export default function Header({ currentUser }: HeaderProps) {
   // Get dark mode from context
   const { darkMode, toggleDarkMode } = useThemeMode();
 
-  // Effect to simulate loading state and add delay
+  // Effect to simulate loading state
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Artificial delay to simulate slow component mount
-      artificialDelay(300);
+      // Remove artificial delay and expensive calculation
       setIsLoading(false);
-
-      // Unnecessary calculations to slow rendering
-      const expensiveCalculation = () => {
-        let result = 0;
-        for (let i = 0; i < 100000; i++) {
-          result += Math.sin(i) * Math.cos(i);
-        }
-        return result;
-      };
-
-      expensiveCalculation();
     }
   }, []);
 
   const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
-    artificialDelay(50);
     setAnchorEl(event.currentTarget);
   };
 
   const handleProfileClose = () => {
-    artificialDelay(50);
     setAnchorEl(null);
   };
 
   const handleNotificationClick = (event: React.MouseEvent<HTMLElement>) => {
-    artificialDelay(50);
     setNotificationAnchorEl(event.currentTarget);
   };
 
   const handleNotificationClose = () => {
-    artificialDelay(50);
     setNotificationAnchorEl(null);
     setUnreadNotifications(0);
   };
 
   const handleToggleDarkMode = () => {
-    // Remove artificial delay for faster theme switching
     toggleDarkMode();
   };
 

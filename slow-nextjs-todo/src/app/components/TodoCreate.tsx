@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Paper,
@@ -18,7 +18,6 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { User, Todo } from '../types';
-import { artificialDelay } from '../utils/performance';
 
 interface TodoCreateProps {
   onAddTodo: (todo: Omit<Todo, 'id'>) => void;
@@ -30,72 +29,61 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
-  const [assignedTo, setAssignedTo] = useState<string | null>(null);
-  const [dueDate, setDueDate] = useState<string | null>(null);
+  const [assignee, setAssignee] = useState<string | null>(null);
+  const [dueDate, setDueDate] = useState<string>('');
+  const [newTag, setNewTag] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [currentTag, setCurrentTag] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [titleError, setTitleError] = useState('');
-
-  // Inefficient effect to slow down rendering
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      artificialDelay(100);
-    }
-  }, [expanded]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handleExpandClick = () => {
-    artificialDelay(50);
     setExpanded(!expanded);
   };
 
   const handleAddTag = () => {
-    artificialDelay(30);
-    if (currentTag.trim() && !tags.includes(currentTag.trim())) {
-      setTags([...tags, currentTag.trim()]);
-      setCurrentTag('');
+    if (newTag.trim() && !tags.includes(newTag.trim())) {
+      setTags([...tags, newTag.trim()]);
+      setNewTag('');
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    artificialDelay(30);
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate the title
-    if (!title.trim()) {
-      setTitleError('Title is required');
+    // Validate form
+    const newErrors: { [key: string]: string } = {};
+    if (!title.trim()) newErrors.title = 'Title is required';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
-    // Simulate slow form submission
-    setIsSubmitting(true);
-    artificialDelay(500);
+    // Clear any previous errors
+    setErrors({});
 
-    const now = new Date().toISOString();
-
-    // Create a new todo with all the metadata
+    // Create new todo
     const newTodo: Omit<Todo, 'id'> = {
-      title,
-      description,
+      title: title.trim(),
+      description: description.trim(),
       completed: false,
       priority,
-      dueDate,
+      assignedTo: assignee,
+      dueDate: dueDate || null,
       tags,
-      createdAt: now,
-      updatedAt: now,
-      assignedTo,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       metadata: {
         source: 'web',
         originatingDevice: 'desktop',
         history: [
           {
             action: 'created',
-            timestamp: now,
-            user: 'user-1', // Current user
+            timestamp: new Date().toISOString(),
+            user: users[0].id, // Default to first user
           },
         ],
         settings: {
@@ -106,16 +94,16 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
       },
     };
 
+    // Add the todo
     onAddTodo(newTodo);
 
-    // Reset form state
+    // Reset form
     setTitle('');
     setDescription('');
     setPriority('medium');
-    setAssignedTo(null);
-    setDueDate(null);
+    setAssignee(null);
+    setDueDate('');
     setTags([]);
-    setIsSubmitting(false);
     setExpanded(false);
   };
 
@@ -128,14 +116,13 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
             placeholder="Add a new todo..."
             value={title}
             onChange={(e) => {
-              artificialDelay(20);
               setTitle(e.target.value);
               if (e.target.value.trim()) {
-                setTitleError('');
+                setErrors({});
               }
             }}
-            error={!!titleError}
-            helperText={titleError}
+            error={!!errors.title}
+            helperText={errors.title}
             sx={{ mr: 2 }}
           />
         ) : (
@@ -168,14 +155,13 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
                 label="Title"
                 value={title}
                 onChange={(e) => {
-                  artificialDelay(20);
                   setTitle(e.target.value);
                   if (e.target.value.trim()) {
-                    setTitleError('');
+                    setErrors({});
                   }
                 }}
-                error={!!titleError}
-                helperText={titleError}
+                error={!!errors.title}
+                helperText={errors.title}
                 required
               />
             </Grid>
@@ -186,7 +172,6 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
                 label="Description"
                 value={description}
                 onChange={(e) => {
-                  artificialDelay(30);
                   setDescription(e.target.value);
                 }}
                 multiline
@@ -202,7 +187,6 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
                   value={priority}
                   label="Priority"
                   onChange={(e) => {
-                    artificialDelay(30);
                     setPriority(e.target.value as 'low' | 'medium' | 'high');
                   }}
                 >
@@ -218,11 +202,10 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
                 <InputLabel id="assignee-label">Assign To</InputLabel>
                 <Select
                   labelId="assignee-label"
-                  value={assignedTo || ''}
+                  value={assignee || ''}
                   label="Assign To"
                   onChange={(e) => {
-                    artificialDelay(30);
-                    setAssignedTo(e.target.value || null);
+                    setAssignee(e.target.value || null);
                   }}
                 >
                   <MenuItem value="">None</MenuItem>
@@ -240,10 +223,9 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
                 fullWidth
                 label="Due Date"
                 type="date"
-                value={dueDate ? dueDate.split('T')[0] : ''}
+                value={dueDate}
                 onChange={(e) => {
-                  artificialDelay(30);
-                  setDueDate(e.target.value ? new Date(e.target.value).toISOString() : null);
+                  setDueDate(e.target.value);
                 }}
                 InputLabelProps={{
                   shrink: true,
@@ -255,10 +237,9 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
               <FormControl fullWidth>
                 <TextField
                   label="Add Tags"
-                  value={currentTag}
+                  value={newTag}
                   onChange={(e) => {
-                    artificialDelay(10);
-                    setCurrentTag(e.target.value);
+                    setNewTag(e.target.value);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -290,7 +271,6 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
                 type="button"
                 variant="outlined"
                 onClick={() => {
-                  artificialDelay(50);
                   setExpanded(false);
                 }}
                 sx={{ mr: 2 }}
@@ -302,9 +282,9 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
                 variant="contained"
                 color="primary"
                 startIcon={<AddIcon />}
-                disabled={isSubmitting || !title.trim()}
+                disabled={!title.trim() || Object.keys(errors).length > 0}
               >
-                {isSubmitting ? 'Adding...' : 'Add Todo'}
+                {Object.keys(errors).length > 0 ? 'Adding...' : 'Add Todo'}
               </Button>
             </Grid>
           </Grid>
@@ -318,9 +298,9 @@ export default function TodoCreate({ onAddTodo, users }: TodoCreateProps) {
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
-            disabled={isSubmitting || !title.trim()}
+            disabled={!title.trim() || Object.keys(errors).length > 0}
           >
-            {isSubmitting ? 'Adding...' : 'Add Todo'}
+            {Object.keys(errors).length > 0 ? 'Adding...' : 'Add Todo'}
           </Button>
         </Box>
       )}

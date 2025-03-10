@@ -8,12 +8,47 @@ export const measureTTI = () => {
   // Start measuring right when the client component mounts
   const start = performance.now();
 
+  // Get a more reliable page load metric
+  let networkParseTime = 0;
+
+  // Try to use Navigation Timing API if available
+  if (window.performance && window.performance.timing) {
+    const timing = window.performance.timing;
+    // Use responseEnd - navigationStart as network+parse time
+    // This represents the time it took to fetch and parse the page
+    networkParseTime = timing.responseEnd - timing.navigationStart;
+
+    // Ensure we don't have negative values (can happen with timing issues)
+    if (networkParseTime < 0 || !isFinite(networkParseTime)) {
+      networkParseTime = 0;
+    }
+  } else if (window.performance && window.performance.getEntriesByType) {
+    // Try to use newer Performance API
+    const navEntries = window.performance.getEntriesByType('navigation');
+    if (navEntries && navEntries.length > 0) {
+      // Cast to PerformanceNavigationTiming which has responseEnd property
+      const navEntry = navEntries[0] as PerformanceNavigationTiming;
+      networkParseTime = navEntry.responseEnd;
+
+      // Ensure we don't have negative values
+      if (networkParseTime < 0 || !isFinite(networkParseTime)) {
+        networkParseTime = 0;
+      }
+    }
+  }
+
   // Function to add to the DOM when fully interactive
   return () => {
     const end = performance.now();
     const timeToInteractive = end - start;
+    const actualLoadTime = end - start;
 
-    console.log({ message: 'Time to Interactive (TTI)', timeToInteractive: `${timeToInteractive.toFixed(2)}ms` });
+    console.log({
+      message: 'Time to Interactive (TTI)',
+      timeToInteractive: `${timeToInteractive.toFixed(2)}ms`,
+      actualLoadTime: `${actualLoadTime.toFixed(2)}ms`,
+      networkParseTime: `${networkParseTime.toFixed(2)}ms`,
+    });
 
     // Create element to display metrics on screen
     const metricsElement = document.createElement('div');
@@ -32,6 +67,9 @@ export const measureTTI = () => {
     metricsElement.innerHTML = `
       <div><strong>⏱️ Performance Metrics:</strong></div>
       <div>Time to Interactive: ${timeToInteractive.toFixed(2)}ms</div>
+      <div>Actual Load Time: ${actualLoadTime.toFixed(2)}ms</div>
+      <div>Network+Parse Time: ${networkParseTime.toFixed(2)}ms</div>
+      <div>Framework: Next.js (React)</div>
     `;
 
     // Add metrics to the DOM
@@ -39,19 +77,6 @@ export const measureTTI = () => {
 
     return timeToInteractive;
   };
-};
-
-// Add artificial rendering delay (now disabled for fair comparison)
-export const artificialDelay = (ms = 300) => {
-  // No-op for fair comparison
-  return;
-
-  // Original implementation:
-  // if (typeof window === 'undefined') return;
-  // const start = performance.now();
-  // while (performance.now() - start < ms) {
-  //   // Busy wait to block the main thread
-  // }
 };
 
 // Function to measure component render times

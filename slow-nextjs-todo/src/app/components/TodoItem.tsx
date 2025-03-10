@@ -26,7 +26,7 @@ import {
   Bookmark as BookmarkIcon,
   Info as InfoIcon,
 } from '@mui/icons-material';
-import { artificialDelay, measureRenderTime } from '../utils/performance';
+import { measureRenderTime } from '../utils/performance';
 
 // A heavy component with many nested elements and unnecessary complexity
 // This will be slow to hydrate
@@ -44,31 +44,8 @@ export default function TodoItem({ todo, users, onToggleComplete, onDelete, onEd
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(todo.title);
   const [editedDescription, setEditedDescription] = useState(todo.description);
-  const [assignee, setAssignee] = useState<User | null>(
-    todo.assignedTo ? users.find((user) => user.id === todo.assignedTo) || null : null
-  );
 
-  // Intentionally inefficient rendering logic
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Removed artificial delay for fair comparison
-      // artificialDelay(50);
-
-      // These state updates are necessary for editing functionality
-      setEditedTitle(todo.title);
-      setEditedDescription(todo.description);
-
-      // Removed expensive operation for fair comparison
-      // const expensiveCalculation = () => {
-      //   let result = 0;
-      //   for (let i = 0; i < 100000; i++) {
-      //     result += Math.sin(i) * Math.cos(i);
-      //   }
-      //   return result;
-      // };
-      // expensiveCalculation();
-    }
-  }, [todo]);
+  const assignee = todo.assignedTo ? users.find((user) => user.id === todo.assignedTo) || null : null;
 
   // Track render time
   const renderTimer = measureRenderTime(`TodoItem-${todo.id}`);
@@ -80,38 +57,34 @@ export default function TodoItem({ todo, users, onToggleComplete, onDelete, onEd
         renderTimer.end();
       };
     }
-  }, [todo]);
+  }, [renderTimer, todo.id]);
 
   const handleToggleComplete = () => {
-    // Add delay to simulate slow event handling
-    artificialDelay(100);
     onToggleComplete(todo.id);
   };
 
   const handleDelete = () => {
-    artificialDelay(100);
     onDelete(todo.id);
   };
 
   const handleEdit = () => {
-    artificialDelay(50);
     setIsEditing(true);
   };
 
   const handleSaveEdit = () => {
-    artificialDelay(100);
-    const updatedTodo = {
+    onEdit({
       ...todo,
       title: editedTitle,
       description: editedDescription,
+      assignedTo: assignee ? assignee.id : null,
       updatedAt: new Date().toISOString(),
-    };
-    onEdit(updatedTodo);
+    });
     setIsEditing(false);
   };
 
+
+
   const handleExpandClick = () => {
-    artificialDelay(50);
     setExpanded(!expanded);
   };
 

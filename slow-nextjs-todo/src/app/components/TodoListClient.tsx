@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, Paper, Skeleton, Pagination, Fab } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Todo, User, FilterOptions } from '../types';
@@ -8,7 +8,7 @@ import TodoItem from './TodoItem';
 import TodoFilter from './TodoFilter';
 import TodoCreate from './TodoCreate';
 import Header from './Header';
-import { measureTTI, artificialDelay, measureRenderTime } from '../utils/performance';
+import { measureTTI, measureRenderTime } from '../utils/performance';
 
 interface TodoListClientProps {
   initialTodos: Todo[];
@@ -18,7 +18,7 @@ interface TodoListClientProps {
 
 export default function TodoListClient({ initialTodos, users, currentUser }: TodoListClientProps) {
   // Measure Time to Interactive when component mounts
-  const [finishTTI, setFinishTTI] = useState<(() => number) | null>(null);
+  const finishTTIRef = useRef<(() => number) | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
   const [todos, setTodos] = useState<Todo[]>(initialTodos);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,31 +33,35 @@ export default function TodoListClient({ initialTodos, users, currentUser }: Tod
 
   // Render timer
   const renderTimer = measureRenderTime('TodoListClient');
+  const metricsDisplayed = useRef(false);
 
-  // Intentionally inefficient effect to simulate heavy hydration
+  // Effect for performance measurement
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !metricsDisplayed.current) {
       renderTimer.start();
 
       // Start measuring TTI
       const ttiMeasurement = measureTTI();
       if (ttiMeasurement) {
-        setFinishTTI(() => ttiMeasurement);
+        finishTTIRef.current = ttiMeasurement;
       }
 
       setIsLoading(false);
       setIsHydrated(true);
 
       // Complete TTI measurement
-      if (finishTTI) {
+      if (finishTTIRef.current) {
         setTimeout(() => {
-          finishTTI();
+          if (finishTTIRef.current) {
+            finishTTIRef.current();
+            metricsDisplayed.current = true;
+          }
         }, 500);
       }
 
       renderTimer.end();
     }
-  }, [finishTTI, renderTimer]);
+  }, [renderTimer]);
 
   // Filter todos based on current filters
   const filteredTodos = todos.filter((todo) => {
@@ -90,7 +94,6 @@ export default function TodoListClient({ initialTodos, users, currentUser }: Tod
   const paginatedTodos = filteredTodos.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
-    artificialDelay(150);
     setCurrentPage(page);
 
     // Scroll to top of list
@@ -100,13 +103,11 @@ export default function TodoListClient({ initialTodos, users, currentUser }: Tod
   };
 
   const handleFilterChange = (newFilters: FilterOptions) => {
-    artificialDelay(100);
     setFilterOptions(newFilters);
     setCurrentPage(1); // Reset to first page
   };
 
   const handleToggleComplete = (id: string) => {
-    artificialDelay(150);
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
         todo.id === id
@@ -132,17 +133,14 @@ export default function TodoListClient({ initialTodos, users, currentUser }: Tod
   };
 
   const handleDeleteTodo = (id: string) => {
-    artificialDelay(200);
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
   };
 
   const handleEditTodo = (updatedTodo: Todo) => {
-    artificialDelay(200);
     setTodos((prevTodos) => prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo)));
   };
 
   const handleAddTodo = (newTodoData: Omit<Todo, 'id'>) => {
-    artificialDelay(300);
     const newTodo: Todo = {
       ...newTodoData,
       id: `todo-${new Date().getTime()}`,
