@@ -1,0 +1,115 @@
+import { createThemeContract } from '@vanilla-extract/css';
+
+// Define the theme contract (type-safe tokens)
+export const themeContract = createThemeContract({
+  color: {
+    brand: null,
+    white: null,
+    black: null,
+    background: null,
+    foreground: null,
+    card: null,
+    cardForeground: null,
+    border: null,
+    input: null,
+    primary: {
+      background: null,
+      foreground: null,
+    },
+    secondary: {
+      background: null,
+      foreground: null,
+    },
+    accent: {
+      background: null,
+      foreground: null,
+    },
+    destructive: {
+      background: null,
+      foreground: null,
+    },
+    muted: {
+      background: null,
+      foreground: null,
+    },
+    low: null,
+    medium: null,
+    high: null,
+  },
+  space: {
+    none: null,
+    xs: null,
+    sm: null,
+    md: null,
+    lg: null,
+    xl: null,
+    '2xl': null,
+    '3xl': null,
+  },
+  fontSizes: {
+    xs: null,
+    sm: null,
+    base: null,
+    lg: null,
+    xl: null,
+    '2xl': null,
+    '3xl': null,
+    '4xl': null,
+  },
+  fontWeights: {
+    light: null,
+    normal: null,
+    medium: null,
+    semibold: null,
+    bold: null,
+  },
+  fonts: {
+    body: null,
+    heading: null,
+    mono: null,
+  },
+  lineHeights: {
+    none: null,
+    tight: null,
+    normal: null,
+    loose: null,
+  },
+  letterSpacings: {
+    tighter: null,
+    tight: null,
+    normal: null,
+    wide: null,
+    wider: null,
+    widest: null,
+  },
+  borderWidths: {
+    thin: null,
+    normal: null,
+    thick: null,
+  },
+  borderRadius: {
+    none: null,
+    sm: null,
+    md: null,
+    lg: null,
+    full: null,
+  },
+  shadows: {
+    sm: null,
+    md: null,
+    lg: null,
+    xl: null,
+  },
+  transitions: {
+    fast: null,
+    normal: null,
+    slow: null,
+  },
+  zIndices: {
+    beneath: null,
+    normal: null,
+    above: null,
+    modal: null,
+    tooltip: null,
+  },
+});
