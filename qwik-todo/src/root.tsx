@@ -1,4 +1,4 @@
-import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import { component$, useSignal, useVisibleTask$, $, createContextId, useContextProvider } from '@builder.io/qwik';
 import { QwikCityProvider, RouterOutlet, ServiceWorkerRegister } from '@builder.io/qwik-city';
 import { RouterHead } from './components/router-head/router-head';
 import { isDev } from '@builder.io/qwik';
@@ -7,6 +7,12 @@ import './global.css.ts';
 import { lightTheme, darkTheme } from './theme';
 import { measureTTI } from './utils/performance';
 
+// Create a context for theme
+export const ThemeContext = createContextId<{
+  isDarkMode: { value: boolean };
+  toggleDarkMode: () => void;
+}>('theme-context');
+
 export default component$(() => {
   /**
    * The root of a QwikCity site always start with the <QwikCityProvider> component,
@@ -14,15 +20,21 @@ export default component$(() => {
    *
    * Don't remove the `<head>` and `<body>` elements.
    */
+  // Initialize with light mode as default (false)
   const isDarkMode = useSignal(false);
 
-  // Initialize theme based on user preference
+  // Toggle dark mode function
+  const toggleDarkMode = $(() => {
+    isDarkMode.value = !isDarkMode.value;
+    console.log({ newDarkModeValue: isDarkMode.value });
+  });
+
+  // Provide the theme context to all child components
+  useContextProvider(ThemeContext, { isDarkMode, toggleDarkMode });
+
+  // Measure TTI for performance comparison
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    isDarkMode.value = prefersDark;
-
-    // Measure TTI for performance comparison
     measureTTI();
   });
 

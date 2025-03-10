@@ -1,22 +1,18 @@
-import { component$, useSignal, $ } from '@builder.io/qwik';
+import { component$, useContext } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 import { TodoList } from '~/components/todos/todo-list';
 import { Header } from '~/components/header';
 import { sampleTodos, sampleUsers } from '~/utils/data';
+import { ThemeContext } from '~/root';
 
 export default component$(() => {
   // Get the first user as the current user
   const currentUser = sampleUsers[0];
-  const isDarkMode = useSignal(false);
-
-  // Toggle dark mode
-  const handleToggleDarkMode = $(() => {
-    isDarkMode.value = !isDarkMode.value;
-  });
+  const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
 
   return (
     <div>
-      <Header currentUser={currentUser} isDarkMode={isDarkMode.value} onToggleDarkMode$={handleToggleDarkMode} />
+      <Header currentUser={currentUser} isDarkMode={isDarkMode.value} onToggleDarkMode$={toggleDarkMode} />
 
       <main
         style={{
