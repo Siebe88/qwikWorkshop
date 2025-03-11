@@ -1,44 +1,51 @@
 import { component$, useStore, $ } from '@builder.io/qwik';
 import { Board } from './board';
 
+// Define the game state interface (similar to React's state)
 interface GameState {
   squares: (string | null)[];
   xIsNext: boolean;
 }
 
 export const Game = component$(() => {
-  // Use a single store instead of multiple signals
+  // In React: const [squares, setSquares] = useState(Array(9).fill(null));
+  // In React: const [xIsNext, setXIsNext] = useState(true);
+  // In Qwik, we use useStore instead of multiple useState calls
   const gameState = useStore<GameState>({
     squares: Array(9).fill(null),
     xIsNext: true,
   });
 
-  // Handle click - optimized to avoid unnecessary array copying
+  // In React: const handleClick = (i) => { ... }
+  // In Qwik: We use $() to mark functions that need serialization
   const handleClick = $((i: number) => {
-    // Calculate winner directly
-    const currentWinner = calculateWinner(gameState.squares);
-
     // If square is already filled or there's a winner, do nothing
-    if (currentWinner || gameState.squares[i]) {
+    if (calculateWinner(gameState.squares) || gameState.squares[i]) {
       return;
     }
 
-    // Update the square directly
+    // In React: const newSquares = squares.slice(); newSquares[i] = xIsNext ? 'X' : 'O';
+    // In Qwik: We can mutate the store directly
     gameState.squares[i] = gameState.xIsNext ? 'X' : 'O';
+
+    // In React: setXIsNext(!xIsNext);
+    // In Qwik: We update the store property directly
     gameState.xIsNext = !gameState.xIsNext;
   });
 
-  // Handle restart
+  // In React: const handleRestart = () => { ... }
+  // In Qwik: We use $() to mark functions that need serialization
   const handleRestart = $(() => {
+    // In React: setSquares(Array(9).fill(null)); setXIsNext(true);
+    // In Qwik: We update the store properties directly
     gameState.squares = Array(9).fill(null);
     gameState.xIsNext = true;
   });
 
-  // Calculate winner directly in the render function
+  // Calculate game status - same logic as React
   const winner = calculateWinner(gameState.squares);
-
-  // Calculate status directly in the render function
   let status: string;
+
   if (winner) {
     status = `Winner: ${winner}`;
   } else if (gameState.squares.every((square) => square !== null)) {
@@ -47,55 +54,20 @@ export const Game = component$(() => {
     status = `Next player: ${gameState.xIsNext ? 'X' : 'O'}`;
   }
 
+  // JSX is similar in both React and Qwik, but Qwik uses $ suffix for event handlers
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <h1
-        style={{
-          marginBottom: '20px',
-          color: '#333',
-          fontSize: '2rem',
-        }}
-      >
-        Qwik Tic Tac Toe
-      </h1>
-      <div
-        style={{
-          marginBottom: '10px',
-          fontSize: '18px',
-          fontWeight: 'bold',
-        }}
-      >
-        {status}
-      </div>
+    <div class="game">
+      <h1 class="game-title">Qwik Tic Tac Toe</h1>
+      <div class="status">{status}</div>
       <Board squares={gameState.squares} onClick$={handleClick} />
-      <button
-        onClick$={handleRestart}
-        style={{
-          padding: '10px 20px',
-          fontSize: '16px',
-          backgroundColor: '#4caf50',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          marginTop: '10px',
-        }}
-        onMouseOver$={(e) => ((e.target as HTMLElement).style.backgroundColor = '#45a049')}
-        onMouseOut$={(e) => ((e.target as HTMLElement).style.backgroundColor = '#4caf50')}
-      >
+      <button class="restart-button" onClick$={handleRestart}>
         Restart Game
       </button>
     </div>
   );
 });
 
-// Helper function to calculate winner
+// Helper function to calculate winner - identical to React version
 function calculateWinner(squares: (string | null)[]): string | null {
   const lines = [
     [0, 1, 2],

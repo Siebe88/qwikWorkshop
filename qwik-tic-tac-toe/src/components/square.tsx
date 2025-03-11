@@ -1,39 +1,15 @@
-import { component$, type QRL, $ } from '@builder.io/qwik';
+import { component$, type QRL } from '@builder.io/qwik';
 
+// Similar interface to React, but with $ suffix for event handlers
 interface SquareProps {
   value: string | null;
-  onClick$: QRL<() => void>;
+  onClick$: QRL<() => void>; // In React: onClick: () => void
 }
 
 export const Square = component$<SquareProps>(({ value, onClick$ }) => {
-  const squareStyle = {
-    background: 'white',
-    border: '1px solid #999',
-    fontSize: '48px',
-    fontWeight: 'bold',
-    lineHeight: '100px',
-    height: '100px',
-    textAlign: 'center' as const,
-    width: '100px',
-    cursor: 'pointer',
-  };
-
-  const handleMouseOver = $((e: MouseEvent) => {
-    (e.target as HTMLElement).style.backgroundColor = '#f0f0f0';
-  });
-
-  const handleMouseOut = $((e: MouseEvent) => {
-    (e.target as HTMLElement).style.backgroundColor = 'white';
-  });
-
+  // JSX is similar in both React and Qwik, but Qwik uses $ suffix for event handlers
   return (
-    <button
-      style={squareStyle}
-      preventdefault:click
-      onClick$={onClick$}
-      onMouseOver$={handleMouseOver}
-      onMouseOut$={handleMouseOut}
-    >
+    <button class="square" onClick$={onClick$}>
       {value}
     </button>
   );
