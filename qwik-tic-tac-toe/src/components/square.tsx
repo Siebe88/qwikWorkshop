@@ -1,9 +1,9 @@
 import { component$, type QRL } from '@builder.io/qwik';
 
-// Similar interface to React, but with $ suffix for event handlers
+// Simplified interface for Square
 interface SquareProps {
   value: string | null;
-  onClick$: QRL<() => void>; // In React: onClick: () => void
+  onClick$: QRL<() => void>;
 }
 
 export const Square = component$<SquareProps>(({ value, onClick$ }) => {

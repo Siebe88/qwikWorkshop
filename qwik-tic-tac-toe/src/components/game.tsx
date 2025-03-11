@@ -16,23 +16,6 @@ export const Game = component$(() => {
     xIsNext: true,
   });
 
-  // In React: const handleClick = (i) => { ... }
-  // In Qwik: We use $() to mark functions that need serialization
-  const handleClick = $((i: number) => {
-    // If square is already filled or there's a winner, do nothing
-    if (calculateWinner(gameState.squares) || gameState.squares[i]) {
-      return;
-    }
-
-    // In React: const newSquares = squares.slice(); newSquares[i] = xIsNext ? 'X' : 'O';
-    // In Qwik: We can mutate the store directly
-    gameState.squares[i] = gameState.xIsNext ? 'X' : 'O';
-
-    // In React: setXIsNext(!xIsNext);
-    // In Qwik: We update the store property directly
-    gameState.xIsNext = !gameState.xIsNext;
-  });
-
   // In React: const handleRestart = () => { ... }
   // In Qwik: We use $() to mark functions that need serialization
   const handleRestart = $(() => {
@@ -59,7 +42,7 @@ export const Game = component$(() => {
     <div class="game">
       <h1 class="game-title">Qwik Tic Tac Toe</h1>
       <div class="status">{status}</div>
-      <Board squares={gameState.squares} onClick$={handleClick} />
+      <Board gameState={gameState} />
       <button class="restart-button" onClick$={handleRestart}>
         Restart Game
       </button>
@@ -68,7 +51,7 @@ export const Game = component$(() => {
 });
 
 // Helper function to calculate winner - identical to React version
-function calculateWinner(squares: (string | null)[]): string | null {
+export function calculateWinner(squares: (string | null)[]): string | null {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
