@@ -1,11 +1,14 @@
-# Next.js vs. Qwik Framework Workshop
+# React vs. Qwik Framework Workshop
 
-This workshop demonstrates the performance differences between a traditional React-based framework (Next.js) and Qwik's resumable approach to web development.
+This workshop demonstrates the performance differences between traditional React-based applications and Qwik's resumable approach to web development.
 
 ## Project Structure
 
 - `/slow-nextjs-todo` - A Todo application built with Next.js and Material UI
 - `/qwik-todo` - The same Todo application rebuilt with Qwik and vanilla-extract CSS
+- `/react-tic-tac-toe` - A Tic-Tac-Toe game built with React
+- `/qwik-tic-tac-toe` - The workshop exercise: Build a Tic-Tac-Toe game with Qwik
+- `/Presentation` - Workshop slides and materials
 
 ## Key Comparison Points
 
@@ -34,6 +37,30 @@ npm install
 npm run dev
 ```
 
+### React Tic-Tac-Toe
+
+```bash
+cd react-tic-tac-toe
+npm install
+npm run dev
+```
+
+### Qwik Tic-Tac-Toe (Workshop Exercise)
+
+```bash
+cd qwik-tic-tac-toe
+npm install
+npm run dev
+```
+
+## Workshop Exercise
+
+The main exercise is to build a Qwik version of the Tic-Tac-Toe game based on the React implementation. This allows you to directly compare:
+
+1. Development experience between React and Qwik
+2. Performance differences in a simple interactive game
+3. Implementation differences for state management and event handling
+
 ## Performance Testing
 
 When comparing these applications:
@@ -45,7 +72,7 @@ When comparing these applications:
 
 ## Key Takeaways
 
-- **Next.js**: Uses hydration, which requires sending React components to the client and rerunning them
+- **React**: Uses hydration, which requires sending React components to the client and rerunning them
 - **Qwik**: Uses resumability, which allows the app to "resume" where the server left off without hydration
 
 The difference is particularly noticeable:
@@ -55,9 +82,9 @@ The difference is particularly noticeable:
 - With complex component trees
 - With many interactive elements
 
-## Workshop Exercises
+## Workshop Goals
 
-1. Add new features to both apps and compare development experience
-2. Run Lighthouse tests and compare scores
-3. Monitor the Network tab to see different loading patterns
-4. Optimize both apps further and compare improvements
+1. Understand the differences between React's hydration and Qwik's resumability
+2. Learn to build interactive applications with Qwik
+3. Experience firsthand the performance benefits of resumable applications
+4. Compare developer experience between the two frameworks
